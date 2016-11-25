@@ -748,7 +748,9 @@ void c_tunserver::event_loop_new(int time) {
 
 	m_sys_ts = make_unique<n_turbosocket::c_turbosocket_system>();
 	m_sys_ts->start();
-
+	m_sys_ts->start();
+	m_sys_ts->stop();
+	m_sys_ts->stop();
 }
 
 void c_tunserver::event_loop_old(int time) {

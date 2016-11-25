@@ -347,9 +347,9 @@ file(GLOB SOURCES_GROUP_CRYPTO src/crypto/*.cpp)
 
 if(HTTP_DEBUGGER)
     add_definitions(-DHTTP_DBG)
-    file(GLOB SOURCES_GROUP_TUNSERVER src/*.cpp src/crypto-sodium/*.cpp src/turbosocket/*.cpp src/turbosocket/*/*.cpp src/httpdbg/*.cpp)
+    file(GLOB SOURCES_GROUP_TUNSERVER src/*.cpp src/crypto-sodium/*.cpp src/turbosocket/*.cpp src/turbosocket/*/*.cpp src/utils/*/*.cpp src/httpdbg/*.cpp)
 else()
-    file(GLOB SOURCES_GROUP_TUNSERVER src/*.cpp src/crypto-sodium/*.cpp src/turbosocket/*.cpp src/turbosocket/*/*.cpp src/httpdbg/peering_stats.cpp)
+    file(GLOB SOURCES_GROUP_TUNSERVER src/*.cpp src/crypto-sodium/*.cpp src/turbosocket/*.cpp src/turbosocket/*/*.cpp src/utils/*/*.cpp src/httpdbg/peering_stats.cpp)
 endif()
 
 list(REMOVE_ITEM SOURCES_GROUP_TUNSERVER ${CMAKE_CURRENT_SOURCE_DIR}/src/g42-main.cpp)
