@@ -535,7 +535,16 @@ void c_tunserver::prepare_socket() {
 		// ...to the device to which we are setting IP address here:
 		assert(address[0] == 0xFD);
 		assert(address[1] == 0x42);
-		m_tun_device.set_ipv6_address(address, 16);
+
+		try {
+			m_tun_device.set_ipv6_address(address, 16);
+		} catch(...) {
+			std::cout
+				<< "======" << std::endl
+				<< boost::locale::gettext("L_TUN_device_not_working") << std::endl
+				<< "======" << std::endl
+				;
+		}
 	}
 
 #ifdef __linux__
