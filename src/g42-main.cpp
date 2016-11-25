@@ -400,6 +400,9 @@ int main(int argc, char **argv) {
                         ("http-dbg-port", po::value<int>()->default_value(9080), boost::locale::gettext("L_what_httpDbgPort_do").c_str())
             #endif
 
+                        ("new-loop", boost::locale::gettext("L_option_new_loop").c_str())
+                        ("old-loop", boost::locale::gettext("L_option_old_loop").c_str())
+
 			#if EXTLEVEL_IS_PREVIEW
 /*
 //			("gen-key", "COMMAND: Generate combination of crypto key"
@@ -894,7 +897,17 @@ int main(int argc, char **argv) {
 #endif
 
 		_note(boost::locale::gettext("L_starting_main_server"));
-		myserver.run_old(); // <=== my server
+		bool loop_new = true;
+		if (argm.count("new-loop")) loop_new=true;
+		if (argm.count("old-loop")) loop_new=false;
+		if (loop_new) {
+			_note("Will use the NEW loop");
+			myserver.run_new(); // <=== my server
+		}
+		else {
+			_note("Will use the OLD loop");
+			myserver.run_old(); // <=== my server
+		}
 		_note(boost::locale::gettext("L_main_server_ended"));
 
 #ifdef HTTP_DBG

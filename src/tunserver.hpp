@@ -215,7 +215,7 @@ class c_tunserver : public c_galaxy_node {
 	protected:
 		void prepare_socket(); ///< make sure that the lower level members of handling the socket are ready to run
 		void event_loop_old(int time = 0); ///< the main loop (old, before threads/TS)
-		void event_lood_new(int time = 0); ///< the main loop (new: thread/TS)
+		void event_loop_new(int time = 0); ///< the main loop (new: thread/TS)
 		void wait_for_fd_event(); ///< waits for event of I/O being ready, needs valid m_tun_fd and others, saves the fd_set into m_fd_set_data
 
 		std::pair<c_haship_addr,c_haship_addr> parse_tun_ip_src_dst(const char *buff, size_t buff_size, unsigned char ipv6_offset); ///< from buffer of TUN-format, with ipv6 bytes at ipv6_offset, extract ipv6 (hip) destination

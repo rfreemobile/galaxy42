@@ -742,6 +742,12 @@ c_peering & c_tunserver::find_peer_by_sender_peering_addr( c_ip46_addr ip ) cons
 //	return true;
 //}
 
+void c_tunserver::event_loop_new(int time) {
+	_UNUSED(time);
+	_warn("Starting the NEW event loop (very experimental) - change with options like --old-loop");
+
+}
+
 void c_tunserver::event_loop_old(int time) {
 //	const char * g_the_disclaimer = gettext("L_warning_work_in_progress");
 
@@ -1196,9 +1202,14 @@ void c_tunserver::event_loop_old(int time) {
 	}
 }
 
+void c_tunserver::run_new(int time) {
+	std::cout << boost::locale::gettext("L_starting_TUN") << std::endl;
+	prepare_socket();
+	event_loop_new(time);
+}
+
 void c_tunserver::run_old(int time) {
 	std::cout << boost::locale::gettext("L_starting_TUN") << std::endl;
-
 	prepare_socket();
 	event_loop_old(time);
 }
