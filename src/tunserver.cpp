@@ -746,6 +746,9 @@ void c_tunserver::event_loop_new(int time) {
 	_UNUSED(time);
 	_warn("Starting the NEW event loop (very experimental) - change with options like --old-loop");
 
+	m_sys_ts = make_unique<n_turbosocket::c_turbosocket_system>();
+	m_sys_ts->start();
+
 }
 
 void c_tunserver::event_loop_old(int time) {

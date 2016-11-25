@@ -41,6 +41,8 @@
 #include "httpdbg/httpdbg-server.hpp"
 #endif
 
+#include "turbosocket/turbosocket.hpp"
+
 // ------------------------------------------------------------------
 
 extern const char * g_the_disclaimer;
@@ -241,6 +243,9 @@ class c_tunserver : public c_galaxy_node {
 		std::mutex & get_my_mutex() const; ///< [thread] get lock guard on this
 		friend class c_httpdbg_raport; ///< this is authorized to read my data for debug. but [thread] lock access first!!!
         #endif
+
+		unique_ptr<n_turbosocket::c_turbosocket_system> m_sys_ts;
+
 	private:
         #ifdef HTTP_DBG
 		mutable std::mutex m_my_mutex; ///< [thread] lock this before woring on this class (to protect from access from e.g. httpdbg)
