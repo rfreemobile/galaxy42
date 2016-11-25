@@ -14,7 +14,7 @@ class c_turbosocket_system : public c_onetime_obj {
 		unique_ptr<c_turbosocket_system_pimpl> m_pimpl;
 	public:
 		c_turbosocket_system();
-		virtual ~c_turbosocket_system() noexcept;
+		virtual ~c_turbosocket_system();
 
 		virtual bool start();
 		virtual bool stop();

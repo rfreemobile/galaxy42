@@ -13,7 +13,7 @@ namespace n_turbosocket {
 class m_command_system : public c_onetime_obj { ///< the TS command system
 	public:
 		m_command_system();
-		virtual ~m_command_system() noexcept;
+		virtual ~m_command_system();
 		virtual bool start();
 		virtual bool stop();
 
@@ -40,7 +40,7 @@ void c_cmd_reader::loop() {
 }
 
 m_command_system::m_command_system() { }
-m_command_system::~m_command_system() noexcept {
+m_command_system::~m_command_system() {
 	destructor_used();
 	// ...
 }
@@ -57,14 +57,16 @@ bool m_command_system::start() {
 }
 
 bool m_command_system::stop() {
-	if (!start_begin()) return false;
+	_note("stop - begin");
+	if (!stop_begin()) return false;
 	m_should_end=true; // flag, will be seen by loops e.g. of reader, running in our threads
 	_note("system stops: will join threads");
 	if (m_thread_reader) {
 		m_thread_reader->join(); // wait for all threads
+	_note("system stops: joined");
 		m_thread_reader.reset(nullptr);
 	}
-	start_end(); return true;
+	stop_end(); return true;
 }
 
 
@@ -81,7 +83,7 @@ c_turbosocket_system::c_turbosocket_system()
 	_note("Creating turbosocket system");
 }
 
-c_turbosocket_system::~c_turbosocket_system() noexcept {
+c_turbosocket_system::~c_turbosocket_system() {
 	_note("Removing turbosocket system");
 	destructor_used();
 }
