@@ -887,15 +887,18 @@ int main(int argc, char **argv) {
 #ifdef HTTP_DBG
 		_note(boost::locale::gettext("L_starting_httpdbg_server"));
         c_httpdbg_server httpdbg_server(http_dbg_port, myserver);
+
 		std::thread httpdbg_thread( [& httpdbg_server]() {
 			httpdbg_server.run();
 		}	);
 #endif
+
 		_note(boost::locale::gettext("L_starting_main_server"));
-		myserver.run();
+		myserver.run_old(); // <=== my server
 		_note(boost::locale::gettext("L_main_server_ended"));
+
 #ifdef HTTP_DBG
-        httpdbg_server.stop();
+		httpdbg_server.stop();
 		httpdbg_thread.join(); // <-- for (also) making sure that main_httpdbg() will die before myserver will die
 		_note(boost::locale::gettext("L_httpdbg_server_ended"));
 #endif

@@ -570,9 +570,12 @@ std::pair<c_haship_addr,c_haship_addr> c_tunserver::parse_tun_ip_src_dst(const c
 
 std::pair<c_haship_addr,c_haship_addr> c_tunserver::parse_tun_ip_src_dst(const char *buff, size_t buff_size, unsigned char ipv6_offset) {
 	// vuln-TODO(u) throw on invalid size + assert
+	_UNUSED(buff_size);
 
 	size_t pos_src = ipv6_offset + g_ipv6_rfc::header_position_of_src , len_src = g_ipv6_rfc::header_length_of_src;
 	size_t pos_dst = ipv6_offset + g_ipv6_rfc::header_position_of_dst , len_dst = g_ipv6_rfc::header_length_of_dst;
+	_UNUSED(len_src);
+	_UNUSED(len_dst);
 	assert(buff_size > pos_src+len_src);
 	assert(buff_size > pos_dst+len_dst);
 	// valid: reading pos_src up to +len_src, and same for dst
@@ -739,7 +742,7 @@ c_peering & c_tunserver::find_peer_by_sender_peering_addr( c_ip46_addr ip ) cons
 //	return true;
 //}
 
-void c_tunserver::event_loop(int time) {
+void c_tunserver::event_loop_old(int time) {
 //	const char * g_the_disclaimer = gettext("L_warning_work_in_progress");
 
 	_info("Entering the event loop");
@@ -887,6 +890,7 @@ void c_tunserver::event_loop(int time) {
 			assert( size_read >= 2 ); // buf: reads from position 0..1 are asserted as valid now
 
 			int proto_version = static_cast<int>( static_cast<unsigned char>(buf[0]) ); // TODO
+			_UNUSED(proto_version);
 			assert(proto_version >= c_protocol::current_version ); // let's assume we will be backward compatible (but this will be not the case untill official stable version probably)
 			c_protocol::t_proto_cmd cmd = static_cast<c_protocol::t_proto_cmd>( buf[1] );
 
@@ -1192,11 +1196,11 @@ void c_tunserver::event_loop(int time) {
 	}
 }
 
-void c_tunserver::run(int time) {
+void c_tunserver::run_old(int time) {
 	std::cout << boost::locale::gettext("L_starting_TUN") << std::endl;
 
 	prepare_socket();
-	event_loop(time);
+	event_loop_old(time);
 }
 
 void c_tunserver::program_action_set_IDI(const string & keyname) {
