@@ -7,8 +7,10 @@
 
 
 #include "utils/tasks/onetime.hpp"
+#include "utils/tasks/thread_rich.hpp"
 
 namespace n_turbosocket {
+
 
 class m_command_system : public c_onetime_obj { ///< the TS command system
 	public:
@@ -17,10 +19,18 @@ class m_command_system : public c_onetime_obj { ///< the TS command system
 		virtual bool start();
 		virtual bool stop();
 
+		std::queue< std::string > m_queue_in; ///< data that we read - commands to execute
+		std::queue< std::string > m_queue_out; ///< data that we will write - replies etc
+
 		std::atomic<bool> m_should_end; ///< we want to finish. this will be read by various "children" e.g. reader object (in thread)
 
 	protected:
-		unique_ptr<std::thread> m_thread_reader;
+		unique_ptr<utils::c_thread> m_thread_in; ///< thread to move data from input into IN queue
+		unique_ptr<utils::c_thread> m_thread_exec; ///< thread to execute data, and save result to OUT queue
+		unique_ptr<utils::c_thread> m_thread_out; ///< thread to send the data from OUT queue to outside
+
+		void join_and_erase(unique_ptr<utils::c_thread> & my_thread); ///< join this thread, then erase/nullptr it
+
 };
 
 class c_cmd_reader {
@@ -47,7 +57,8 @@ m_command_system::~m_command_system() {
 
 bool m_command_system::start() {
 	if (!start_begin()) return false;
-	m_thread_reader = make_unique<std::thread>(
+	m_thread_in = make_unique<utils::c_thread>(
+		"TS-cmd",
 		[this]() {
 			c_cmd_reader reader(*this);
 			reader.loop();
@@ -56,16 +67,26 @@ bool m_command_system::start() {
 	start_end(); return true;
 }
 
+void m_command_system::join_and_erase(unique_ptr<utils::c_thread> & my_thread) {
+	if (my_thread) {
+		_info("Joining thread...");
+		my_thread->join();
+		_info("Joining thread - done");
+		my_thread = nullptr;
+	}
+}
+
 bool m_command_system::stop() {
 	_note("stop - begin");
 	if (!stop_begin()) return false;
 	m_should_end=true; // flag, will be seen by loops e.g. of reader, running in our threads
 	_note("system stops: will join threads");
-	if (m_thread_reader) {
-		m_thread_reader->join(); // wait for all threads
-	_note("system stops: joined");
-		m_thread_reader.reset(nullptr);
+
+	if (m_thread_in) {
+		m_thread_in->join(); // wait for all threads
+		m_thread_in.reset(nullptr);
 	}
+
 	stop_end(); return true;
 }
 
