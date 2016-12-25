@@ -113,5 +113,6 @@ copy_noarch() {
 }
 copy_noarch
 
+echo "NSIS installer:"
 "$galaxy_dir/contrib/nsis-installer-windows/galaxy-windows-installer" || fail "NSIS failed."
 

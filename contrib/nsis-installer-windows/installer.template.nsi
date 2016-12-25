@@ -1,5 +1,12 @@
-SetCompress force
-SetCompressor ZLIB
+SetCompress VAR
+SetCompressor VAR
+# ^--- this two lines must be replaced, e.g. with:
+# SetCompress force
+# SetCompressor /SOLID ZLIB
+# or
+# SetCompress off
+# SetCompressor ZLIB
+# we do that from our script that will start makensis
 
 Unicode true
 !include MUI2.nsh

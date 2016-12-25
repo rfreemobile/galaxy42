@@ -71,13 +71,17 @@ popd
 
 fi
 
-# use the nsis tool - actually build installer of our project!
-pushd nsis/install_dir || fail
 
-REFERENCE_DATETIME="2016-08-01 00:00:00"
+for nsis_mode in nopack pack
+do
+	printf "\n\n\n\n%s\n\n" "Building NSIS installer in nsis_mode=$nsis_mode"
 
-printf "\n%s\n" "WRAPPING makensis localy in $(pwd)"
+	# use the nsis tool - actually build installer of our project!
+	pushd nsis/install_dir || fail
 
+	REFERENCE_DATETIME="2016-08-01 00:00:00"
+
+	printf "\n%s\n" "WRAPPING makensis localy in $(pwd), for REFERENCE_DATETIME=$REFERENCE_DATETIME."
 	echo '#!/bin/bash' > "makensis_wrapped"
 	echo "REAL=$(pwd)/makensis" >> "makensis_wrapped"
 	echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> "makensis_wrapped"
@@ -89,18 +93,36 @@ printf "\n%s\n" "WRAPPING makensis localy in $(pwd)"
 	printf "\n\nPreparing to makensis in PWD=$PWD\n\n"
 	cp "$galaxy42_dir/contrib/nsis-installer-windows/plugins/NSIS_Service_Lib/servicelib.nsh" ./ || fail "copy nsis plugin here for use"
 	printf "\n\nRunning makensis in PWD=$PWD\n\n"
-	set -x
 
+	cp "${SCRIPT_DIR}/installer.template.nsi" "${SCRIPT_DIR}/installer.nsi"
+
+	# write the installer.nsi compression:
+	if [[ "$nsis_mode" == "pack" ]] ; then
+		our_install_exe="galaxy42_installer.exe"
+		printf "\n%s\n" "NSIS - enable compression"
+		sed -i -e 's/SetCompress VAR/SetCompress force/' "${SCRIPT_DIR}/installer.nsi"
+		sed -i -e 's/SetCompressor VAR/SetCompressor \/SOLID ZLIB/' "${SCRIPT_DIR}/installer.nsi"
+	else
+		our_install_exe="galaxy42_installer_nopack.exe"
+		printf "\n%s\n" "NSIS - DISABLE compression"
+		sed -i -e 's/SetCompress VAR/SetCompress off/' "${SCRIPT_DIR}/installer.nsi"
+		sed -i -e 's/SetCompressor VAR/SetCompressor ZLIB/' "${SCRIPT_DIR}/installer.nsi"
+	fi
+		
 	# generate file list that will be pushed to installer.nsi file 
 	"${SCRIPT_DIR}/bin/generate_nsis_filelist.sh" > tmp.out
 	sed -i '/START_FILES/r tmp.out' "${SCRIPT_DIR}/installer.nsi"
 	rm tmp.out
 
 	# use wrapped
+	set -x
 	./makensis_wrapped "$galaxy42_dir/contrib/nsis-installer-windows/installer.nsi" || fail "Makensis of our project failed"
 	set +x
+
+	# copy installer to gitian out dir (where can be accessed by host)
+	our_install_outdir="/home/ubuntu/out/${nsis_mode}/"
+	mkdir "$our_install_outdir"
+	cp "$galaxy42_dir/contrib/nsis-installer-windows/galaxy42_installer.exe" "/home/ubuntu/out/${nsis_mode}/" || fail "copy windows installer to 'out'"
 popd
 
-# copy installer to gitian out dir (where can be accessed by host)
-cp "$galaxy42_dir/contrib/nsis-installer-windows/galaxy42_installer.exe" "/home/ubuntu/out" || fail "copy windows installer to 'out'"
 
