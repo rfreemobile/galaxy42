@@ -999,7 +999,18 @@ void asiotest_udpserv(std::vector<std::string> options) {
 
 			auto & this_socket_and_strand = wire_socket.at(socket_nr);
 
+			while (!g_atomic_exit) {
+				_dbg1("Wire read (blocking)...");
+				auto bytes_transferred = this_socket_and_strand.get_unsafe_assume_in_strand().get()
+					.receive_from( inbuf_asio , inbuf_tab.get(inbuf_nr).m_ep );
+
+				g_speed_wire_recv.add(1, bytes_transferred); // [counter] inc
+
+				_dbg1("Wire read (blocking) size="<<bytes_transferred);
+			}
+
 			// [asioflow]
+			/*
 			this_socket_and_strand.get_strand().post([&inbuf_tab, &mutex_handlerflow_socket_wire,   &this_socket_and_strand, inbuf_nr, inbuf_asio] {
 				this_socket_and_strand.get_unsafe_assume_in_strand().get().async_receive_from( inbuf_asio , inbuf_tab.get(inbuf_nr).m_ep ,
 						[&this_socket_and_strand, &inbuf_tab , inbuf_nr, &mutex_handlerflow_socket_wire](const boost::system::error_code & ec, std::size_t bytes_transferred) {
@@ -1009,6 +1020,7 @@ void asiotest_udpserv(std::vector<std::string> options) {
 					); // start async
 				} // post lambda
 			); // post
+			*/
 		}
 	} ;
 
