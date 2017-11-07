@@ -688,6 +688,7 @@ void cryptotest_mesure_one(int crypto_op, uint32_t param_msg_size, t_crypt_opt b
 			c_crypto_benchloop<decltype(crypto_func_veri),false,1> benchloop(crypto_func_veri);
 			speed_gbps = benchloop.run_test_3buf(bench_opt, msg_buf, two_buf, key_buf);
 		}
+		break;
 		case -12:
 		{
 			func_name = "encrypt_salsa20";
